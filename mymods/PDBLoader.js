@@ -15,36 +15,43 @@ class PDBLoader extends Loader { // PDBLoader class extends Loader class from th
 	}
 	
 
-	load( url, onLoad, onProgress, onError ) {
+	load( input, onLoad, onProgress, onError ) {
 		const scope = this;
 
-		const loader = new FileLoader( scope.manager );
-		loader.setPath( scope.path );
-		loader.setRequestHeader( scope.requestHeader );
-		loader.setWithCredentials( scope.withCredentials );
-		loader.load( url, function ( text ) {
+		//Detect whether the input is a  URL or raw text
+		const isTextInput = typeof input === 'string' && (input.includes('\n') || input.includes('ATOM'));
 
-			try {
+		if (isTextInput) {
+        	// ----------------------------------------------------------
+        	// CASE 1: input is already raw PDB text (e.g. from FileReader)
+        	// ----------------------------------------------------------
+        	try {
+            	const result = scope.parse(input);
+            	if (onLoad) onLoad(result);
+        	} catch (e) {
+            	if (onError) onError(e);
+            	else console.error(e);
+        	}
+        	return; // stop here — don’t use FileLoader
+    	}
 
-				onLoad( scope.parse( text ) );
+		// ----------------------------------------------------------
+    	// CASE 2: input is a URL/path (default behavior)
+    	// ----------------------------------------------------------
+    	const loader = new FileLoader(scope.manager);
+    	loader.setPath(scope.path);
+    	loader.setRequestHeader(scope.requestHeader);
+    	loader.setWithCredentials(scope.withCredentials);
 
-			} catch ( e ) {
-
-				if ( onError ) {
-
-					onError( e );
-
-				} else {
-
-					console.error( e );
-
-				}
-
-				scope.manager.itemError( url );
-
-			}
-
-		}, onProgress, onError );
+    	loader.load(input, function (text) {
+        	try {
+            	onLoad(scope.parse(text));
+        	} catch (e) {
+            	if (onError) onError(e);
+            	else console.error(e);
+            	scope.manager.itemError(input);
+        	}
+    	}, onProgress, onError);
 
 	}
 
