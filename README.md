@@ -12,7 +12,7 @@ An [updated version of the EMMAs](https://drive.google.com/drive/folders/1TyMhYd
 
 ### Installing
 
-No installation needed! Just access the project at this link: [MolVisWeb Dev](https://maya-mau.github.io/molvisweb_dev/).
+No installation needed! Just access the project at this link: [MolVisWeb Dev](https://nutmegkim.github.io/molvisweb_dev_cont/index.html).
 
 ## Help
 
