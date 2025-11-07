@@ -262,16 +262,16 @@ function setUpControls() {
         document.addEventListener("keydown", (event) => {
             switch (event.code) {
                 case "ArrowRight":
-                controls.truck(moveSpeed, 0, true);
+                controls.truck(-moveSpeed, 0, true);
                     break;
                 case "ArrowLeft":
-                    controls.truck(-moveSpeed, 0, true);
+                    controls.truck(moveSpeed, 0, true);
                     break;
                 case "ArrowDown":
-                    controls.truck(0, moveSpeed, true);
+                    controls.truck(0, -moveSpeed, true);
                     break;
                 case "ArrowUp":
-                    controls.truck(0, -moveSpeed, true);
+                    controls.truck(0, moveSpeed, true);
                     break;
             }
         });
@@ -367,6 +367,40 @@ function init() {
         loadMolecule(molecule, () => { resetViewCameraWindow(); });
         resetInterface();
     });
+
+    // ----------------------------------------------------------
+    // File upload event listener for reading .pdb files directly
+    // ----------------------------------------------------------
+    const pdbForm = document.getElementById('pdb-upload-form');
+    if (pdbForm) {
+        pdbForm.addEventListener('submit', function(e) {
+            e.preventDefault(); 
+
+            const fileInput = document.getElementById('pdbFile');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Please choose a PDB file first.");
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const pdbText = event.target.result;
+                console.log("Loaded PDB file:", file.name);
+                console.log(pdbText.substring(0, 300)); // preview text in console
+                currentMolecule = pdbText;
+
+                // Replace current molecule with uploaded one:
+                resetScene(); // optional, clear current scene if you have a function for that
+                loadMolecule(pdbText,() => { resetViewCameraWindow(); });
+                resetInterface(); // optional, reinitialize controls if needed
+            };
+
+            reader.readAsText(file);
+        });
+    }
+
 
     createGUI();    
 }
